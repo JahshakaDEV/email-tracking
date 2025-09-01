@@ -36,6 +36,18 @@ app.get("/new-pixel", (req, res) => {
   res.send(`New tracking pixel created: ${trackingUrl}`);
 })
 
+app.get("/delete/:id.png", (req, res) => {
+  const id = req.params.id;
+
+  if (!links[id]) {
+    return res.status(404).send("Not found");
+  }
+
+  delete links[id];
+  fs.writeFileSync(linksFile, JSON.stringify(links, null, 2));
+  res.send(`ID ${id} was deleted`);
+})
+
 app.get("/:id.png", (req, res) => {
   const id = req.params.id;
 
@@ -56,8 +68,6 @@ app.get("/:id.png", (req, res) => {
     imgPath = path.join(__dirname, "signature.png");
   }
   res.sendFile(imgPath);
-
-
 });
 
 app.get("/stats", (req, res) => {
