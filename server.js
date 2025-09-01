@@ -12,7 +12,7 @@ if (fs.existsSync(linksFile)) {
   links = JSON.parse(fs.readFileSync(linksFile, "utf-8"));
 }
 
-app.get("/new", (req, res) => {
+app.get("/new-signature", (req, res) => {
   const id = uuidv4(); // unique random string
   const filename = `${id}.png`;
 
@@ -22,6 +22,18 @@ app.get("/new", (req, res) => {
   const trackingUrl = `localhost:${PORT}/${filename}`;
   res.send(`New tracking signature created: <br><code>${trackingUrl}</code>`);
 });
+
+app.get("/new-pixel", (req, res) => {
+  let id = uuidv4();
+  id = 'px-' + id;
+  const filename = `${id}.png`;
+
+  links[id] = { created: new Date().toISOString(), opens: 0 };
+  fs.writeFileSync(linksFile, JSON.stringify(links, null, 2));
+
+  const trackingUrl = `localhost:${PORT}/${filename}`;
+  res.send(`New tracking pixel created: ${trackingUrl}`);
+})
 
 app.get("/:id.png", (req, res) => {
   const id = req.params.id;
@@ -36,8 +48,15 @@ app.get("/:id.png", (req, res) => {
   links[id].opens += 1;
   fs.writeFileSync(linksFile, JSON.stringify(links, null, 2));
 
-  const imgPath = path.join(__dirname, "signature.png");
+  let imgPath;
+  if (id.startsWith('px-')) {
+    imgPath = path.join(__dirname, "px.png")
+  } else {
+    imgPath = path.join(__dirname, "signature.png");
+  }
   res.sendFile(imgPath);
+
+
 });
 
 app.get("/stats", (req, res) => {
