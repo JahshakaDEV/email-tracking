@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require("uuid");
 
 const app = express();
 const PORT = 3000;
+const url = 'localhost'
 const linksFile = path.join(__dirname, "links.json");
 let links = {};
 
@@ -19,7 +20,7 @@ app.get("/new-signature", (req, res) => {
   links[id] = { created: new Date().toISOString(), opens: 0 };
   fs.writeFileSync(linksFile, JSON.stringify(links, null, 2));
 
-  const trackingUrl = `localhost:${PORT}/${filename}`;
+  const trackingUrl = `${url}:${PORT}/${filename}`;
   res.send(`New tracking signature created: <br><code>${trackingUrl}</code>`);
 });
 
@@ -31,7 +32,7 @@ app.get("/new-pixel", (req, res) => {
   links[id] = { created: new Date().toISOString(), opens: 0 };
   fs.writeFileSync(linksFile, JSON.stringify(links, null, 2));
 
-  const trackingUrl = `localhost:${PORT}/${filename}`;
+  const trackingUrl = `${url}:${PORT}/${filename}`;
   res.send(`New tracking pixel created: ${trackingUrl}`);
 })
 
@@ -64,5 +65,5 @@ app.get("/stats", (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`Tracker server running at http://localhost:${PORT}`);
+  console.log(`Tracker server running at http://${url}:${PORT}`);
 });
